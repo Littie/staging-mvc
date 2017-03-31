@@ -9,11 +9,16 @@ class HomeController extends Controller
 {
     public function __construct()
     {
-        echo 'HomeController';
+
     }
 
     public function index()
     {
         echo 'home/index';
+    }
+
+    public function test()
+    {
+        echo 'home/test';
     }
 }

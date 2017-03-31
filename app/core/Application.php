@@ -15,46 +15,93 @@ class Application
 
     protected $params = [];
 
+    protected $uri = null;
+
+    /**
+     * Application constructor.
+     */
     public function __construct()
     {
-        $uri = $this->parseUrl();
-        $pathToControllerFile = $this->getControllerPath($uri);
+        $this->parseUrl();
+
+        $pathToControllerFile = $this->getControllerPath();
 
         if (file_exists($pathToControllerFile)) {
-            $this->getControllerName($uri);
+            require_once $pathToControllerFile;
+
+            $this->controller = $this->getController();
+            $this->method = $this->getMethodName();
+            $this->params = $this->getParameters();
         }
 
-        require_once $pathToControllerFile;
 
-        $this->controller = new $this->controller();
+        call_user_func_array([$this->controller, $this->method], $this->params);
     }
 
-    public function parseUrl() {
-        $uri = $_SERVER['REQUEST_URI'];
+    /**
+     * Get parameters.
+     *
+     * @return array
+     */
+    private function getParameters(): array
+    {
+        return $this->uri ? array_values($this->uri) : [];
+    }
 
-        if(isset($uri)) {
-            return explode('/', filter_var(trim($uri, '/')), FILTER_SANITIZE_URL);
+    /**
+     * Get method name.
+     *
+     * @return string
+     */
+    private function getMethodName()
+    {
+        $method = '';
+
+        if (isset($this->uri[1]) && method_exists($this->controller, $this->uri[1])) {
+            $method = $this->uri[1];
+
+            unset($this->uri[1]);
+        }
+
+        return $method;
+    }
+
+    /**
+     * Parse URI.
+     */
+    public function parseUrl() {
+        $this->uri = $_SERVER['REQUEST_URI'];
+
+        if(null !== $this->uri) {
+            $this->uri = explode('/', filter_var(trim($this->uri, '/')), FILTER_SANITIZE_URL);
         }
     }
 
     /**
      * Return controller path.
      *
-     * @param array $uri
-     *
      * @return string
+     *
+     * @internal param array $uri
      */
-    private function getControllerPath(array $uri): string
+    private function getControllerPath(): string
     {
-        return __DIR__ . '/../controllers/' . ucfirst($uri[0]) . 'Controller.php';
+        return __DIR__ . '/../controllers/' . ucfirst($this->uri[0]) . 'Controller.php';
     }
 
     /**
+     * Get controller name.
      *
+     * @return Controller
+     *
+     * @internal param array $uri
      */
-    private function getControllerName(array &$uri)
+    private function getController(): Controller
     {
-        $this->controller = ucfirst($uri[0]) . 'Controller';
-        unset($uri[0]);
+        $controllerName = ucfirst($this->uri[0]) . 'Controller';
+
+        unset($this->uri[0]);
+
+        return new $controllerName;
     }
 }
