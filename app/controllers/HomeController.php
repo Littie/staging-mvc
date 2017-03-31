@@ -7,6 +7,11 @@ declare(strict_types=1);
  */
 class HomeController extends Controller
 {
+    public function __construct()
+    {
+        echo 'HomeController';
+    }
+
     public function index()
     {
         echo 'home/index';
