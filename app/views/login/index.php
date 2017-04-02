@@ -1,3 +1,1 @@
-<?php
-
-echo 'hello, there';
+<a href="<?= $data['href']?>">Authentication</a>
