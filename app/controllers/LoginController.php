@@ -5,10 +5,16 @@ declare(strict_types = 1);
 class LoginController extends Controller
 {
     public function index() {
+        //'code' => $_GET['code'],
+
         $config = $this->config('login/oauth2');
 
-        var_dump($config);
+        $authUri = $config['authUri'];
 
-        $this->view('login/index');
+        $href = $authUri . '?' . urldecode(http_build_query($config['auth_params']));
+
+        var_dump($href);
+
+        $this->view('login/index', $href);
     }
 }
