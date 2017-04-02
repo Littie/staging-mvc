@@ -22,16 +22,23 @@ class Application
      */
     public function __construct()
     {
-        $this->parseUrl();
+        $this->setUri();
+        $this->init();
+    }
 
+    /**
+     * Init method.
+     */
+    private function init()
+    {
         $pathToControllerFile = $this->getControllerPath();
 
         if (file_exists($pathToControllerFile)) {
             require_once $pathToControllerFile;
 
-            $this->controller = $this->getController();
+            $this->setController();
             $this->setMethodName();
-            $this->params = $this->getParameters();
+            $this->setParameters();
         }
 
 
@@ -40,16 +47,14 @@ class Application
 
     /**
      * Get parameters.
-     *
-     * @return array
      */
-    private function getParameters(): array
+    private function setParameters()
     {
-        return $this->uri ? array_values($this->uri) : [];
+        $this->params = $this->uri ? array_values($this->uri) : [];
     }
 
     /**
-     * Get method name.
+     * Set method name.
      *
      * @return string
      */
@@ -63,9 +68,9 @@ class Application
     }
 
     /**
-     * Parse URI.
+     * Set URI.
      */
-    public function parseUrl() {
+    public function setUri() {
         $this->uri = $_SERVER['REQUEST_URI'];
 
         if(null !== $this->uri) {
@@ -74,7 +79,7 @@ class Application
     }
 
     /**
-     * Return controller path.
+     * Set controller path.
      *
      * @return string
      *
@@ -88,16 +93,15 @@ class Application
     /**
      * Get controller name.
      *
-     * @return Controller
-     *
      * @internal param array $uri
+     * @internal param string $controller
      */
-    private function getController(): Controller
+    private function setController()
     {
         $controllerName = ucfirst($this->uri[0]) . 'Controller';
 
         unset($this->uri[0]);
 
-        return new $controllerName;
+        $this->controller = new $controllerName;
     }
 }
