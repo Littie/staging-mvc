@@ -11,7 +11,7 @@ class Application
 {
     protected $controller = '';
 
-    protected $method = '';
+    protected $method = 'index';
 
     protected $params = [];
 
@@ -30,7 +30,7 @@ class Application
             require_once $pathToControllerFile;
 
             $this->controller = $this->getController();
-            $this->method = $this->getMethodName();
+            $this->setMethodName();
             $this->params = $this->getParameters();
         }
 
@@ -53,17 +53,13 @@ class Application
      *
      * @return string
      */
-    private function getMethodName()
+    private function setMethodName()
     {
-        $method = '';
-
         if (isset($this->uri[1]) && method_exists($this->controller, $this->uri[1])) {
-            $method = $this->uri[1];
+            $this->method = $this->uri[1];
 
             unset($this->uri[1]);
         }
-
-        return $method;
     }
 
     /**
