@@ -19,6 +19,33 @@ class Request
         $this->init();
     }
 
+    public function getParameter(string $parameter)
+    {
+        return $this->params[$parameter];
+    }
+    
+    /**
+     * Redirect helper;
+     * 
+     * @param $url
+     */
+    public function redirect($url)
+    {
+        header('Location: ' . $url);
+
+        exit();
+    }
+
+    /**
+     * Return query string path.
+     *
+     * @return string
+     */
+    public function getUri(): string
+    {
+        return $this->uri;
+    }
+
     /**
      * Init POST parameters.
      */
@@ -34,10 +61,6 @@ class Request
     {
         parse_str($_SERVER['QUERY_STRING'], $this->params);
         $this->uri = $_SERVER['REDIRECT_URL'];
-    }
-    
-    public function getUri() {
-        return $this->uri;
     }
 
     /**
