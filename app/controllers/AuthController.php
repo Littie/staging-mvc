@@ -25,6 +25,8 @@ class AuthController extends Controller
     public function index()
     {
         $this->setData();
+
+        $this->request->redirect('board');
     }
 
     /**
