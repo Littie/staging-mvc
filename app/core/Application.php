@@ -9,6 +9,8 @@ declare(strict_types=1);
  */
 class Application
 {
+    protected $request = '';
+
     protected $controller = '';
 
     protected $method = 'index';
@@ -22,7 +24,6 @@ class Application
      */
     public function __construct()
     {
-        $this->setUri();
         $this->init();
     }
 
@@ -31,6 +32,10 @@ class Application
      */
     private function init()
     {
+        $this->request = new Request();
+        
+        $this->setUri();
+
         $pathToControllerFile = $this->getControllerPath();
 
         if (file_exists($pathToControllerFile)) {
@@ -71,11 +76,7 @@ class Application
      * Set URI.
      */
     public function setUri() {
-        $this->uri = $_SERVER['REQUEST_URI'];
-
-        if(null !== $this->uri) {
-            $this->uri = explode('/', filter_var(trim($this->uri, '/')), FILTER_SANITIZE_URL);
-        }
+        $this->uri = explode('/', filter_var(trim($this->request->getUri(), '/')), FILTER_SANITIZE_URL);
     }
 
     /**
